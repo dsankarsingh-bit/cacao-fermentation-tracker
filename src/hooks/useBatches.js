@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { loadBatches, saveBatches } from '../utils/storage'
+import { getBatches as loadBatches, saveBatches } from '../utils/storage'
 
 export default function useBatches() {
   const [batches, setBatches] = useState(() => loadBatches())
