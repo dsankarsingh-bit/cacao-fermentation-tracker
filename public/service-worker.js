@@ -1,18 +1,20 @@
+const CACHE_NAME = 'ferm-v2';
+const STATIC_ASSETS = ['/manifest.json', '/icon-192.png', '/icon-512.png'];
+
 self.addEventListener('install', (e) => {
+  e.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS)));
+});
+
+self.addEventListener('activate', (e) => {
   e.waitUntil(
-    caches.open('ferm-v1').then((cache) => {
-      return cache.addAll([
-        '/',
-        '/index.html'
-      ]);
-    })
+    caches.keys().then((keys) =>
+      Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
+    )
   );
 });
 
 self.addEventListener('fetch', (e) => {
   e.respondWith(
-    caches.match(e.request).then((response) => {
-      return response || fetch(e.request);
-    })
+    caches.match(e.request).then((cached) => cached || fetch(e.request))
   );
 });
