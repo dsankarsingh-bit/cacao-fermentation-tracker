@@ -35,9 +35,9 @@ export default function BatchCard({ batch }) {
         <span>
           <span className="font-medium">{days}</span> / {batch.targetDays} days
         </span>
-        {batch.quantity > 0 && <span>{batch.quantity} kg</span>}
+        {batch.quantity && <span>{batch.quantity}</span>}
         <span>{batch.temperatureReadings.length} readings</span>
-        <span>{batch.turningEvents.length} turns</span>
+        <span>{batch.turningLog.length} turns</span>
       </div>
     </Link>
   )

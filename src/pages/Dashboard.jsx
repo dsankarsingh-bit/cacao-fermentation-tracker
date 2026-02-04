@@ -1,12 +1,17 @@
 import { useBatchContext } from '../App'
 import BatchCard from '../components/BatchCard'
+import DataSync from '../components/DataSync'
 import { Link } from 'react-router-dom'
 
 export default function Dashboard() {
-  const { batches } = useBatchContext()
+  const { batches, loading } = useBatchContext()
 
   const active = batches.filter(b => b.status === 'active')
   const completed = batches.filter(b => b.status === 'completed')
+
+  if (loading) {
+    return <div className="text-center py-20"><p className="text-amber-500 text-sm">Loading…</p></div>
+  }
 
   if (batches.length === 0) {
     return (
@@ -25,7 +30,10 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-8">
-      <h1 className="text-2xl font-bold text-amber-900">Dashboard</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-amber-900">Dashboard</h1>
+        <DataSync />
+      </div>
 
       {active.length > 0 && (
         <section>

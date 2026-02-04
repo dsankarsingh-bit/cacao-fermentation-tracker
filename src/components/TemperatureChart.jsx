@@ -1,14 +1,5 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 
-function formatX(timestamp) {
-  const d = new Date(timestamp)
-  return `${d.getMonth() + 1}/${d.getDate()} ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`
-}
-
-function formatTooltipLabel(timestamp) {
-  return new Date(timestamp).toLocaleString()
-}
-
 export default function TemperatureChart({ readings }) {
   if (readings.length === 0) {
     return (
@@ -19,8 +10,9 @@ export default function TemperatureChart({ readings }) {
   }
 
   const data = readings.map(r => ({
+    day: r.day,
+    temp: r.temp,
     timestamp: r.timestamp,
-    celsius: r.celsius,
   }))
 
   return (
@@ -29,8 +21,8 @@ export default function TemperatureChart({ readings }) {
         <LineChart data={data} margin={{ top: 8, right: 16, left: 0, bottom: 8 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#f0e6d3" />
           <XAxis
-            dataKey="timestamp"
-            tickFormatter={formatX}
+            dataKey="day"
+            tickFormatter={(d) => `Day ${d}`}
             tick={{ fontSize: 11, fill: '#92400e' }}
             interval="preserveStartEnd"
           />
@@ -40,13 +32,13 @@ export default function TemperatureChart({ readings }) {
             unit="°C"
           />
           <Tooltip
-            labelFormatter={formatTooltipLabel}
+            labelFormatter={(d) => `Day ${d}`}
             formatter={(value) => [`${value} °C`, 'Temperature']}
             contentStyle={{ borderRadius: '8px', border: '1px solid #d97706', fontSize: '13px' }}
           />
           <Line
             type="monotone"
-            dataKey="celsius"
+            dataKey="temp"
             stroke="#b45309"
             strokeWidth={2.5}
             dot={{ r: 3, fill: '#b45309' }}

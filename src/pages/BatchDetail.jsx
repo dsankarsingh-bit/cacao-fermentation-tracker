@@ -11,7 +11,7 @@ function daysElapsed(startDate) {
 
 export default function BatchDetail() {
   const { id } = useParams()
-  const { getBatchById, updateBatch, removeBatch } = useBatchContext()
+  const { getBatchById, removeBatch, addReading, addTurning, markComplete } = useBatchContext()
   const navigate = useNavigate()
   const batch = getBatchById(id)
 
@@ -28,22 +28,19 @@ export default function BatchDetail() {
 
   const days = daysElapsed(batch.startDate)
 
-  const handleAddReading = (reading) => {
-    updateBatch(id, (b) => ({
-      ...b,
-      temperatureReadings: [...b.temperatureReadings, reading],
-    }))
+  const computeDay = (timestamp) =>
+    Math.floor((new Date(timestamp).getTime() - new Date(batch.startDate).getTime()) / 86400000) + 1
+
+  const handleAddReading = ({ timestamp, temp }) => {
+    addReading(id, computeDay(timestamp), temp)
   }
 
-  const handleAddTurning = (event) => {
-    updateBatch(id, (b) => ({
-      ...b,
-      turningEvents: [...b.turningEvents, event],
-    }))
+  const handleAddTurning = ({ timestamp }) => {
+    addTurning(id, computeDay(timestamp))
   }
 
   const handleComplete = () => {
-    updateBatch(id, { status: 'completed' })
+    markComplete(id)
   }
 
   const handleDelete = () => {
@@ -93,7 +90,7 @@ export default function BatchDetail() {
         </div>
         <div className="flex-1 text-center border-l border-amber-200">
           <p className="text-xs text-amber-500 uppercase tracking-wide">Quantity</p>
-          <p className="text-sm font-semibold text-amber-900">{batch.quantity || '—'} kg</p>
+          <p className="text-sm font-semibold text-amber-900">{batch.quantity || '—'}</p>
         </div>
         <div className="flex-1 text-center border-l border-amber-200">
           <p className="text-xs text-amber-500 uppercase tracking-wide">Started</p>
@@ -111,7 +108,7 @@ export default function BatchDetail() {
       {/* Turning log section */}
       <section className="bg-white border border-amber-200 rounded-xl p-5 space-y-4">
         <h2 className="font-semibold text-amber-900">Turning Log</h2>
-        <TurningLog events={batch.turningEvents} />
+        <TurningLog entries={batch.turningLog} />
         {batch.status === 'active' && <TurningEventForm onAdd={handleAddTurning} />}
       </section>
     </div>

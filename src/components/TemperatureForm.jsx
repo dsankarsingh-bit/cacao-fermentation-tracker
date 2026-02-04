@@ -6,18 +6,18 @@ function nowLocal() {
 
 export default function TemperatureForm({ onAdd }) {
   const [timestamp, setTimestamp] = useState(nowLocal())
-  const [celsius, setCelsius] = useState('')
+  const [temp, setTemp] = useState('')
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    if (!celsius) return
+    if (!temp) return
 
     onAdd({
       timestamp: new Date(timestamp).toISOString(),
-      celsius: parseFloat(celsius),
+      temp: parseFloat(temp),
     })
 
-    setCelsius('')
+    setTemp('')
     setTimestamp(nowLocal())
   }
 
@@ -32,8 +32,8 @@ export default function TemperatureForm({ onAdd }) {
         />
         <input
           type="number"
-          value={celsius}
-          onChange={e => setCelsius(e.target.value)}
+          value={temp}
+          onChange={e => setTemp(e.target.value)}
           placeholder="°C"
           step="0.1"
           min="0"

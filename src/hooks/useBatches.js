@@ -1,31 +1,61 @@
 import { useState, useEffect, useCallback } from 'react'
-import { getBatches as loadBatches, saveBatches } from '../utils/storage'
+import { collection, onSnapshot } from 'firebase/firestore'
+import { db } from '../firebase'
+import {
+  addBatch as storageAddBatch,
+  deleteBatch as storageDeleteBatch,
+  addTemperatureReading,
+  addTurningLog,
+  completeBatch as storageCompleteBatch,
+  exportData,
+  importData as storageImportData,
+} from '../utils/storage'
 
 export default function useBatches() {
-  const [batches, setBatches] = useState(() => loadBatches())
+  const [batches, setBatches] = useState([])
+  const [loading, setLoading] = useState(true)
 
+  // Real-time listener — updates automatically when any device writes.
   useEffect(() => {
-    saveBatches(batches)
-  }, [batches])
-
-  const addBatch = useCallback((batch) => {
-    setBatches(prev => [...prev, batch])
-    return batch
+    const unsubscribe = onSnapshot(collection(db, 'batches'), (snapshot) => {
+      setBatches(snapshot.docs.map(d => ({ id: d.id, ...d.data() })))
+      setLoading(false)
+    })
+    return () => unsubscribe()
   }, [])
 
-  const updateBatch = useCallback((id, updater) => {
-    setBatches(prev =>
-      prev.map(b => (b.id === id ? (typeof updater === 'function' ? updater(b) : { ...b, ...updater }) : b))
-    )
-  }, [])
+  const addBatch = useCallback((batchData) => storageAddBatch(batchData), [])
 
-  const removeBatch = useCallback((id) => {
-    setBatches(prev => prev.filter(b => b.id !== id))
-  }, [])
+  const removeBatch = useCallback((id) => storageDeleteBatch(id), [])
 
   const getBatchById = useCallback((id) => {
     return batches.find(b => b.id === id) || null
   }, [batches])
 
-  return { batches, addBatch, updateBatch, removeBatch, getBatchById }
+  const addReading = useCallback((batchId, day, temp) => {
+    addTemperatureReading(batchId, day, temp)
+  }, [])
+
+  const addTurning = useCallback((batchId, day) => {
+    addTurningLog(batchId, day)
+  }, [])
+
+  const markComplete = useCallback((id) => storageCompleteBatch(id), [])
+
+  const handleExport = useCallback(() => exportData(batches), [batches])
+
+  const importBatches = useCallback((jsonString) => storageImportData(jsonString), [])
+
+  return {
+    batches,
+    loading,
+    addBatch,
+    removeBatch,
+    getBatchById,
+    addReading,
+    addTurning,
+    markComplete,
+    exportData: handleExport,
+    importBatches,
+  }
 }

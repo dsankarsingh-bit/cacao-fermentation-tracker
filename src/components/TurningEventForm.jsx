@@ -6,17 +6,14 @@ function nowLocal() {
 
 export default function TurningEventForm({ onAdd }) {
   const [timestamp, setTimestamp] = useState(nowLocal())
-  const [notes, setNotes] = useState('')
 
   const handleSubmit = (e) => {
     e.preventDefault()
 
     onAdd({
       timestamp: new Date(timestamp).toISOString(),
-      notes: notes.trim(),
     })
 
-    setNotes('')
     setTimestamp(nowLocal())
   }
 
@@ -26,13 +23,6 @@ export default function TurningEventForm({ onAdd }) {
         type="datetime-local"
         value={timestamp}
         onChange={e => setTimestamp(e.target.value)}
-        className="border border-amber-300 rounded-lg px-2.5 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
-      />
-      <input
-        type="text"
-        value={notes}
-        onChange={e => setNotes(e.target.value)}
-        placeholder="Notes (optional)"
         className="border border-amber-300 rounded-lg px-2.5 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
       />
       <button

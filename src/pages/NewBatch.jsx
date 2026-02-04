@@ -18,23 +18,18 @@ export default function NewBatch() {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (!form.name.trim()) return
 
-    const batch = {
-      id: `batch_${Date.now()}`,
+    const batch = await addBatch({
       name: form.name.trim(),
       origin: form.origin.trim(),
       startDate: new Date(form.startDate).toISOString(),
-      quantity: parseFloat(form.quantity) || 0,
-      status: 'active',
+      quantity: form.quantity ? `${form.quantity} kg` : '',
       targetDays: parseInt(form.targetDays, 10) || 6,
-      temperatureReadings: [],
-      turningEvents: [],
-    }
+    })
 
-    addBatch(batch)
     navigate(`/batch/${batch.id}`)
   }
 
