@@ -4,6 +4,7 @@ import TemperatureChart from '../components/TemperatureChart'
 import TurningLog from '../components/TurningLog'
 import TemperatureForm from '../components/TemperatureForm'
 import TurningEventForm from '../components/TurningEventForm'
+import ReadingsList from '../components/ReadingsList'
 
 function daysElapsed(startDate) {
   return Math.floor((Date.now() - new Date(startDate).getTime()) / 86400000)
@@ -11,7 +12,7 @@ function daysElapsed(startDate) {
 
 export default function BatchDetail() {
   const { id } = useParams()
-  const { getBatchById, removeBatch, addReading, addTurning, markComplete } = useBatchContext()
+  const { getBatchById, removeBatch, addReading, addTurning, setReadings, setTurningLog, markComplete } = useBatchContext()
   const navigate = useNavigate()
   const batch = getBatchById(id)
 
@@ -37,6 +38,21 @@ export default function BatchDetail() {
 
   const handleAddTurning = ({ timestamp }) => {
     addTurning(id, computeDay(timestamp))
+  }
+
+  const handleEditReading = (index, newTemp) => {
+    const updated = batch.temperatureReadings.map((r, i) =>
+      i === index ? { ...r, temp: newTemp } : r
+    )
+    setReadings(id, updated)
+  }
+
+  const handleDeleteReading = (index) => {
+    setReadings(id, batch.temperatureReadings.filter((_, i) => i !== index))
+  }
+
+  const handleDeleteTurning = (index) => {
+    setTurningLog(id, batch.turningLog.filter((_, i) => i !== index))
   }
 
   const handleComplete = () => {
@@ -102,13 +118,18 @@ export default function BatchDetail() {
       <section className="bg-white border border-amber-200 rounded-xl p-5 space-y-4">
         <h2 className="font-semibold text-amber-900">Temperature</h2>
         <TemperatureChart readings={batch.temperatureReadings} />
+        <ReadingsList
+          readings={batch.temperatureReadings}
+          onEdit={batch.status === 'active' ? handleEditReading : undefined}
+          onDelete={batch.status === 'active' ? handleDeleteReading : undefined}
+        />
         {batch.status === 'active' && <TemperatureForm onAdd={handleAddReading} />}
       </section>
 
       {/* Turning log section */}
       <section className="bg-white border border-amber-200 rounded-xl p-5 space-y-4">
         <h2 className="font-semibold text-amber-900">Turning Log</h2>
-        <TurningLog entries={batch.turningLog} />
+        <TurningLog entries={batch.turningLog} onDelete={batch.status === 'active' ? handleDeleteTurning : undefined} />
         {batch.status === 'active' && <TurningEventForm onAdd={handleAddTurning} />}
       </section>
     </div>

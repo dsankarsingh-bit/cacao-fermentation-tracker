@@ -6,6 +6,8 @@ import {
   deleteBatch as storageDeleteBatch,
   addTemperatureReading,
   addTurningLog,
+  updateTemperatureReadings,
+  updateTurningLog,
   completeBatch as storageCompleteBatch,
   exportData,
   importData as storageImportData,
@@ -40,6 +42,10 @@ export default function useBatches() {
     addTurningLog(batchId, day)
   }, [])
 
+  const setReadings = useCallback((batchId, readings) => updateTemperatureReadings(batchId, readings), [])
+
+  const setTurningLog = useCallback((batchId, entries) => updateTurningLog(batchId, entries), [])
+
   const markComplete = useCallback((id) => storageCompleteBatch(id), [])
 
   const handleExport = useCallback(() => exportData(batches), [batches])
@@ -54,6 +60,8 @@ export default function useBatches() {
     getBatchById,
     addReading,
     addTurning,
+    setReadings,
+    setTurningLog,
     markComplete,
     exportData: handleExport,
     importBatches,

@@ -34,6 +34,14 @@ export async function addTurningLog(batchId, day) {
   })
 }
 
+export async function updateTemperatureReadings(batchId, readings) {
+  await updateDoc(doc(db, BATCHES, batchId), { temperatureReadings: readings })
+}
+
+export async function updateTurningLog(batchId, entries) {
+  await updateDoc(doc(db, BATCHES, batchId), { turningLog: entries })
+}
+
 export async function completeBatch(id) {
   await updateBatch(id, { status: 'completed' })
 }
