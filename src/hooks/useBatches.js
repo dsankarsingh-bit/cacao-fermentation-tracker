@@ -4,6 +4,7 @@ import { db } from '../firebase'
 import {
   addBatch as storageAddBatch,
   deleteBatch as storageDeleteBatch,
+  updateBatch as storageUpdateBatch,
   addTemperatureReading,
   addTurningLog,
   updateTemperatureReadings,
@@ -29,6 +30,8 @@ export default function useBatches() {
   const addBatch = useCallback((batchData) => storageAddBatch(batchData), [])
 
   const removeBatch = useCallback((id) => storageDeleteBatch(id), [])
+
+  const editBatch = useCallback((id, updates) => storageUpdateBatch(id, updates), [])
 
   const getBatchById = useCallback((id) => {
     return batches.find(b => b.id === id) || null
@@ -57,6 +60,7 @@ export default function useBatches() {
     loading,
     addBatch,
     removeBatch,
+    editBatch,
     getBatchById,
     addReading,
     addTurning,
